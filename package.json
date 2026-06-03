@@ -1,0 +1,13 @@
+{
+  "name": "gateway-pagamento",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npx vercel dev",
+    "lint": "node --check api/mercadopago/preference.js && node --check api/mercadopago/webhook.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.10.0"
+  }
+}
