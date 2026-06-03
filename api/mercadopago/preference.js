@@ -1,6 +1,6 @@
 import { carregarItemCheckout, validarItemCheckout } from '../_lib/catalogo.js'
 import { db, serverTimestamp } from '../_lib/firebaseAdmin.js'
-import { allowCors, getBaseUrl, readJsonBody, sendJson } from '../_lib/http.js'
+import { allowCors, getGatewayBaseUrl, getReturnBaseUrl, readJsonBody, sendJson } from '../_lib/http.js'
 import { criarPreferencia } from '../_lib/mercadoPago.js'
 
 const sanitizeBuyer = (comprador = {}) => ({
@@ -33,11 +33,12 @@ export default async function handler(req, res) {
 
     const item = await carregarItemCheckout({ tipo, id })
     const preco = validarItemCheckout(item, tipo, quantidade)
-    const baseUrl = getBaseUrl(req)
+    const returnBaseUrl = getReturnBaseUrl(req)
+    const gatewayBaseUrl = getGatewayBaseUrl(req)
     const pedidoRef = db.collection('pedidos').doc()
     const pedidoId = pedidoRef.id
     const titulo = tipo === 'produto' ? item.nome : `Ingresso ${item.nome}`
-    const notificationUrl = process.env.MERCADO_PAGO_WEBHOOK_URL || `${baseUrl}/api/mercadopago/webhook`
+    const notificationUrl = process.env.MERCADO_PAGO_WEBHOOK_URL || `${gatewayBaseUrl}/api/mercadopago/webhook`
 
     await pedidoRef.set({
       tipo,
@@ -72,9 +73,9 @@ export default async function handler(req, res) {
         },
       },
       back_urls: {
-        success: `${baseUrl}/checkout-retorno?status=sucesso&pedido=${pedidoId}`,
-        failure: `${baseUrl}/checkout-retorno?status=falha&pedido=${pedidoId}`,
-        pending: `${baseUrl}/checkout-retorno?status=pendente&pedido=${pedidoId}`,
+        success: `${returnBaseUrl}/checkout-retorno?status=sucesso&pedido=${pedidoId}`,
+        failure: `${returnBaseUrl}/checkout-retorno?status=falha&pedido=${pedidoId}`,
+        pending: `${returnBaseUrl}/checkout-retorno?status=pendente&pedido=${pedidoId}`,
       },
       auto_return: 'approved',
       external_reference: pedidoId,
