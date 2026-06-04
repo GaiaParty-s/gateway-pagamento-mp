@@ -1,4 +1,5 @@
 import { db } from './firebaseAdmin.js'
+import { readListaByCpf } from './lista.js'
 
 const collectionsByType = {
   produto: 'Produtos',
@@ -44,4 +45,24 @@ export const validarItemCheckout = (item, tipo, quantidade) => {
   }
 
   return preco
+}
+
+export const carregarCadastroPreLista = async (cpf) => {
+  const cadastro = await readListaByCpf(cpf)
+
+  if (!cadastro) {
+    throw new Error('CPF nao encontrado na lista.')
+  }
+
+  if (cadastro.status === 'reprovado' || cadastro.status === 'recusado') {
+    throw new Error('Este cadastro nao esta liberado para compra.')
+  }
+
+  return {
+    cpf: String(cadastro.cpf || cadastro.id).replace(/\D/g, ''),
+    nome: String(cadastro.nome || '').trim(),
+    email: String(cadastro.email || '').trim().toLowerCase(),
+    telefone: String(cadastro.telefone || '').replace(/\D/g, ''),
+    status: cadastro.status || 'pendente',
+  }
 }

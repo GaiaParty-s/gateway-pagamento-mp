@@ -1,13 +1,7 @@
-import { carregarItemCheckout, validarItemCheckout } from '../_lib/catalogo.js'
+import { carregarCadastroPreLista, carregarItemCheckout, validarItemCheckout } from '../_lib/catalogo.js'
 import { db, serverTimestamp } from '../_lib/firebaseAdmin.js'
 import { allowCors, getGatewayBaseUrl, getReturnBaseUrl, readJsonBody, sendJson } from '../_lib/http.js'
 import { criarPreferencia } from '../_lib/mercadoPago.js'
-
-const sanitizeBuyer = (comprador = {}) => ({
-  nome: String(comprador.nome || '').trim(),
-  email: String(comprador.email || '').trim().toLowerCase(),
-  telefone: String(comprador.telefone || '').replace(/\D/g, ''),
-})
 
 const validateBuyer = (comprador) => {
   if (comprador.nome.length < 3) throw new Error('Informe o nome do comprador.')
@@ -27,7 +21,7 @@ export default async function handler(req, res) {
     const tipo = String(body.tipo || '').trim()
     const id = String(body.id || '').trim()
     const quantidade = Math.max(1, Math.min(Number(body.quantidade) || 1, 10))
-    const comprador = sanitizeBuyer(body.comprador)
+    const comprador = await carregarCadastroPreLista(body.cpf)
 
     validateBuyer(comprador)
 
@@ -48,6 +42,7 @@ export default async function handler(req, res) {
       precoUnitario: preco,
       total: preco * quantidade,
       comprador,
+      preListaStatus: comprador.status,
       status: 'aguardando_pagamento',
       provider: 'mercado_pago',
       criadoEm: serverTimestamp(),

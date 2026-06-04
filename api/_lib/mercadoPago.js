@@ -28,6 +28,15 @@ export const criarPreferencia = (payload) =>
     body: JSON.stringify(payload),
   })
 
+export const criarPagamento = (payload, idempotencyKey) =>
+  mercadoPagoRequest('/v1/payments', {
+    method: 'POST',
+    headers: {
+      'X-Idempotency-Key': idempotencyKey,
+    },
+    body: JSON.stringify(payload),
+  })
+
 export const buscarPagamento = (paymentId) =>
   mercadoPagoRequest(`/v1/payments/${paymentId}`, {
     method: 'GET',

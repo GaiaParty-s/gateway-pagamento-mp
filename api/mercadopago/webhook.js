@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import { db, serverTimestamp } from '../_lib/firebaseAdmin.js'
 import { allowCors, readJsonBody, sendJson } from '../_lib/http.js'
+import { updateListaPaymentStatus } from '../_lib/lista.js'
 import { buscarPagamento } from '../_lib/mercadoPago.js'
 
 const getPaymentId = (req, body) =>
@@ -84,6 +85,8 @@ export default async function handler(req, res) {
       },
       atualizadoEm: serverTimestamp(),
     }, { merge: true })
+
+    await updateListaPaymentStatus(pedidoId, payment)
 
     return sendJson(res, 200, { received: true })
   } catch (error) {

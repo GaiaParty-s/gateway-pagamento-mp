@@ -19,6 +19,7 @@ MERCADO_PAGO_USE_SANDBOX=true
 PUBLIC_SITE_URL=https://front-principal.vercel.app
 CORS_ORIGIN=https://front-principal.vercel.app,https://segundo-front.vercel.app
 FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account",...}
+HUB_DESENVOLVEDOR_TOKEN=token_temporario_hub
 ```
 
 `CORS_ORIGIN` aceita mais de um front separado por virgula. Quando um front permitido chama o gateway, o Mercado Pago volta para esse mesmo front em `/checkout-retorno`.
@@ -42,4 +43,5 @@ No front-end, configure:
 
 ```text
 VITE_API_BASE_URL=https://seu-gateway.vercel.app
+VITE_MERCADO_PAGO_PUBLIC_KEY=APP_USR... ou TEST...
 ```
